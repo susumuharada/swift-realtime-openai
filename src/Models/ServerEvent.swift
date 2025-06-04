@@ -15,6 +15,13 @@ public enum ServerEvent: Sendable {
 		public let session: Session
 	}
 
+    public struct TranscriptionSessionEvent: Decodable, Sendable {
+        /// The unique ID of the server event.
+        public let eventId: String
+        /// The session resource.
+        public let session: TranscriptionSession
+    }
+
 	public struct ConversationCreatedEvent: Decodable, Sendable {
 		public struct Conversation: Codable, Sendable {
 			/// The unique ID of the conversation.
@@ -332,6 +339,8 @@ public enum ServerEvent: Sendable {
 	case error(ErrorEvent)
 	/// Returned when a session is created. Emitted automatically when a new connection is established.
 	case sessionCreated(SessionEvent)
+    /// Returned when a transcription session is created. Emitted automatically when a new connection is established.
+    case transcriptionSessionCreated(TranscriptionSessionEvent)
 	/// Returned when a session is updated.
 	case sessionUpdated(SessionEvent)
 	/// Returned when a conversation is created. Emitted right after session creation.
@@ -399,6 +408,8 @@ extension ServerEvent: Identifiable {
 				return event.eventId
 			case let .sessionCreated(event):
 				return event.eventId
+            case let .transcriptionSessionCreated(event):
+                return event.eventId
 			case let .sessionUpdated(event):
 				return event.eventId
 			case let .conversationCreated(event):
@@ -477,6 +488,8 @@ extension ServerEvent: Decodable {
 				self = try .sessionCreated(SessionEvent(from: decoder))
 			case "session.updated":
 				self = try .sessionUpdated(SessionEvent(from: decoder))
+            case "transcription_session.created":
+                self = try .transcriptionSessionCreated(TranscriptionSessionEvent(from: decoder))
 			case "conversation.created":
 				self = try .conversationCreated(ConversationCreatedEvent(from: decoder))
 			case "input_audio_buffer.committed":
@@ -533,8 +546,6 @@ extension ServerEvent: Decodable {
 				self = try .responseFunctionCallArgumentsDone(ResponseFunctionCallArgumentsDoneEvent(from: decoder))
 			case "rate_limits.updated":
 				self = try .rateLimitsUpdated(RateLimitsUpdatedEvent(from: decoder))
-            case "transcription_session.created":
-                self = try .sessionCreated(SessionEvent(from: decoder))
 			default:
 				throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(eventType)")
 		}
