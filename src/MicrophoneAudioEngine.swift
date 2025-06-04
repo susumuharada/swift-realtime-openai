@@ -45,13 +45,8 @@ class MicrophoneAudioEngine {
         let audioPublisher = self.audioPublisher
 
         // enable echo cancellation by default
-        #if !os(macOS)
-        // TODO: VP unit has weird effect. This implicitly establishes requirement of being invoked first
-        Logger.audio.debug("voiceProcessing needs to be enabled before configuring the audio engine")
         try audioEngine.inputNode.setVoiceProcessingEnabled(true)
-        #endif
 
-        // TODO: rdar://148024693 (Improve audio engine to have fixed desired audio format)
         let voiceProcessingFormat = audioEngine.inputNode.outputFormat(forBus: 0)
 
         // based on this: https://developer.apple.com/videos/play/wwdc2019/510

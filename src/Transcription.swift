@@ -164,14 +164,15 @@ public extension Transcription {
         guard !isListening else { return }
 
 
-        let microphoneEngine = try MicrophoneAudioEngine()
-        try microphoneEngine.start()
-        microphoneListener = microphoneEngine.audioPublisher.sink { [weak self] buffer in
-//            self.handleMicrophoneAudio(buffer)
-            self?.processAudioBufferFromUser(buffer: buffer)
+        Task {
+            let microphoneEngine = try MicrophoneAudioEngine()
+            try microphoneEngine.start()
+            microphoneListener = microphoneEngine.audioPublisher.sink { [weak self] buffer in
+                //            self.handleMicrophoneAudio(buffer)
+                self?.processAudioBufferFromUser(buffer: buffer)
+            }
+            self.microphoneEngine = microphoneEngine
         }
-        self.microphoneEngine = microphoneEngine
-
 
 //        guard let converter = AVAudioConverter(from: audioEngine.inputNode.outputFormat(forBus: 0), to: desiredFormat) else {
 //            throw ConversationError.converterInitializationFailed
