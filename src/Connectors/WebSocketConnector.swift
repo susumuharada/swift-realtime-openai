@@ -21,7 +21,9 @@ public final class WebSocketConnector: Connector, Sendable {
 		let (events, stream) = AsyncThrowingStream.makeStream(of: ServerEvent.self)
 
 		let webSocket = URLSession.shared.webSocketTask(with: request)
+        print("Resuming webSocket task with request \(request)")
 		webSocket.resume()
+        print("Resumed webSocket task")
 
 		task = Task.detached { [webSocket, stream] in
 			var isActive = true
@@ -37,7 +39,9 @@ public final class WebSocketConnector: Connector, Sendable {
 				}
 
 				do {
+                    print("Waiting to receive on web socket")
 					let message = try await webSocket.receive()
+                    print("Receive message on web socket: \(message)")
 
 					guard case let .string(text) = message, let data = text.data(using: .utf8) else {
 						stream.yield(error: RealtimeAPIError.invalidMessage)

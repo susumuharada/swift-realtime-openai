@@ -49,11 +49,13 @@ public final class Transcription: @unchecked Sendable {
 
         let events = client.events
         task = Task.detached { [weak self] in
+            print("Transcription: awaiting for event on stream")
             for try await event in events {
                 guard !Task.isCancelled else { break }
 
                 await self?.handleEvent(event)
             }
+            print("Transcription: event stream closed?")
 
             await MainActor.run { [weak self] in
                 self?.connected = false
