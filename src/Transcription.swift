@@ -75,6 +75,20 @@ public final class Transcription: @unchecked Sendable {
                 try await self?.send(audioDelta: audioData)
             }
         }
+
+        Task {
+            try await whenConnected {
+                print("Transcription connected")
+                try await updateSession { session in
+                    print("Updating instructions")
+                    session.instructions = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
+
+                    var audioTranscription = Session.InputAudioTranscription(model: .gpt4o)
+                    audioTranscription.prompt = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
+                    session.inputAudioTranscription = audioTranscription
+                }
+            }
+        }
     }
 
     deinit {

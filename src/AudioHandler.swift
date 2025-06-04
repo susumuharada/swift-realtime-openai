@@ -51,6 +51,7 @@ final class AudioHandler: @unchecked Sendable {
     /// > Warning: Make sure to handle the case where the user denies microphone access.
     @MainActor func startListening() throws {
         guard !isListening else { return }
+        print("AudioHandler startListening")
         if !handlingVoice { try startHandlingVoice() }
 
         Task.detached { [audioEngine] in
@@ -66,7 +67,7 @@ final class AudioHandler: @unchecked Sendable {
     /// This won't stop playing back model responses. To fully stop handling voice conversations, call `stopHandlingVoice`.
     @MainActor func stopListening() {
         guard isListening else { return }
-
+        print("AudioHandler stopListening")
         audioEngine.inputNode.removeTap(onBus: 0)
         isListening = false
     }
@@ -74,6 +75,7 @@ final class AudioHandler: @unchecked Sendable {
     /// Handle the playback of audio responses from the model.
     @MainActor func startHandlingVoice() throws {
         guard !handlingVoice else { return }
+        print("AudioHandler startHandlingVoice")
 
         guard let converter = AVAudioConverter(from: audioEngine.inputNode.outputFormat(forBus: 0), to: desiredFormat) else {
             throw ConversationError.converterInitializationFailed
@@ -112,6 +114,7 @@ final class AudioHandler: @unchecked Sendable {
     /// This lets the model know that the user didn't hear the full response.
     @MainActor func interruptSpeech(_ perform: (AudioHandler) -> Void) {
         guard !isInterrupting else { return }
+        print("AudioHandler interruptSpeech")
         isInterrupting = true
 
         perform(self)
@@ -123,6 +126,7 @@ final class AudioHandler: @unchecked Sendable {
 
     @MainActor func stopHandlingVoice() {
         guard handlingVoice else { return }
+        print("AudioHandler stopHandlingVoice")
 
         Self.cleanUpAudio(playerNode: playerNode, audioEngine: audioEngine)
 
