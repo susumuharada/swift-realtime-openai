@@ -43,9 +43,7 @@ public final class Conversation: @unchecked Sendable {
 
 	/// Whether the user is currently speaking.
 	/// This only works when using the server's voice detection.
-    @MainActor public var isUserSpeaking: Bool {
-        audioHandler.isUserSpeaking
-    }
+	@MainActor public var isUserSpeaking: Bool = false
 
 	/// Whether the model is currently speaking.
     @MainActor public var isPlaying: Bool {
@@ -249,6 +247,7 @@ public extension Conversation {
 /// Event handling private API
 private extension Conversation {
 	@MainActor func handleEvent(_ event: ServerEvent) {
+        print("Handling event \(event)")
 		switch event {
 			case let .error(event):
 				errorStream.yield(event.error)

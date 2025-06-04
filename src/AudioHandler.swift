@@ -26,10 +26,6 @@ final class AudioHandler: @unchecked Sendable {
     /// Whether this conversation is currently handling voice input and output.
     @MainActor public private(set) var handlingVoice: Bool = false
 
-    /// Whether the user is currently speaking.
-    /// This only works when using the server's voice detection.
-    @MainActor public private(set) var isUserSpeaking: Bool = false
-
     /// Whether the model is currently speaking.
     @MainActor public private(set) var isPlaying: Bool = false
 
