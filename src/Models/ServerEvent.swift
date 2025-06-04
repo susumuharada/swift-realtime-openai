@@ -533,6 +533,8 @@ extension ServerEvent: Decodable {
 				self = try .responseFunctionCallArgumentsDone(ResponseFunctionCallArgumentsDoneEvent(from: decoder))
 			case "rate_limits.updated":
 				self = try .rateLimitsUpdated(RateLimitsUpdatedEvent(from: decoder))
+            case "transcription_session.created":
+                self = try .sessionCreated(SessionEvent(from: decoder))
 			default:
 				throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(eventType)")
 		}
