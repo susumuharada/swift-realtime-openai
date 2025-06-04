@@ -46,6 +46,7 @@ extension RealtimeAPI {
         } else {
             requestURL.append(queryItems: [URLQueryItem(name: "model", value: model)])
         }
+        print("Request URL: \(requestURL.absoluteString)")
         var request = URLRequest(url: requestURL)
 		request.addValue("realtime=v1", forHTTPHeaderField: "OpenAI-Beta")
 		request.addValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")

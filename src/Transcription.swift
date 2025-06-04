@@ -108,8 +108,10 @@ public final class Transcription: @unchecked Sendable {
 
     /// Wait for the connection to be established
     @MainActor public func waitForConnection() async {
+        print("Waiting for connection")
         while true {
             if connected {
+                print("Connected")
                 return
             }
 
