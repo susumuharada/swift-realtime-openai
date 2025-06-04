@@ -41,12 +41,12 @@ public final class WebSocketConnector: Connector, Sendable {
 				do {
                     print("Waiting to receive on web socket")
 					let message = try await webSocket.receive()
-                    print("Receive message on web socket: \(message)")
 
 					guard case let .string(text) = message, let data = text.data(using: .utf8) else {
 						stream.yield(error: RealtimeAPIError.invalidMessage)
 						continue
 					}
+                    print("Receive message on web socket: '\(text)'")
 
 					try stream.yield(decoder.decode(ServerEvent.self, from: data))
 				} catch {
