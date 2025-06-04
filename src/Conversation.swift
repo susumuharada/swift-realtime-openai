@@ -43,7 +43,9 @@ public final class Conversation: @unchecked Sendable {
 
 	/// Whether the user is currently speaking.
 	/// This only works when using the server's voice detection.
-	@MainActor public private(set) var isUserSpeaking: Bool = false
+    @MainActor public var isUserSpeaking: Bool {
+        audioHandler.isUserSpeaking
+    }
 
 	/// Whether the model is currently speaking.
     @MainActor public var isPlaying: Bool {
@@ -209,6 +211,7 @@ public extension Conversation {
             {
                 Task { [client] in
                     do {
+                        print("Sending truncateConversationItem")
                         try await client.send(event: .truncateConversationItem(forItem: itemID, atAudioMs: audioTimeInMiliseconds))
                     } catch {
                         print("Failed to send automatic truncation event: \(error)")
