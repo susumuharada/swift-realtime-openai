@@ -178,7 +178,7 @@ extension Item: Codable {
 	}
 }
 
-extension Item.Audio: Decodable {
+extension Item.Audio: Codable {
 	private enum CodingKeys: String, CodingKey {
 		case audio
 		case transcript
@@ -198,9 +198,16 @@ extension Item.Audio: Decodable {
 			audio = Data()
 		}
 	}
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(transcript, forKey: .transcript)
+        let encodedAudio = audio.base64EncodedString()
+        try container.encode(encodedAudio, forKey: .audio)
+    }
 }
 
-extension Item.ContentPart: Decodable {
+extension Item.ContentPart: Codable {
 	private enum CodingKeys: String, CodingKey {
 		case type
 		case text
@@ -230,6 +237,19 @@ extension Item.ContentPart: Decodable {
 				throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown content type: \(type)")
 		}
 	}
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .text(let text):
+            try container.encode("text", forKey: .type)
+            var textContainer = container.nestedContainer(keyedBy: Text.CodingKeys.self, forKey: .text)
+            try textContainer.encode(text, forKey: .text)
+        case .audio(let audio):
+            try container.encode("audio", forKey: .type)
+            try audio.encode(to: encoder)
+        }
+    }
 }
 
 extension Item.Message.Content: Codable {

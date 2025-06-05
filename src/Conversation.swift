@@ -248,7 +248,7 @@ public extension Conversation {
 /// Event handling private API
 private extension Conversation {
 	@MainActor func handleEvent(_ event: ServerEvent) {
-        Logger.conversation.log("Handling event:\n\(String(describing: event))")
+        Logger.conversation.log("Handling event:\n\(event.debugDescription)")
 		switch event {
 			case let .error(event):
 				errorStream.yield(event.error)

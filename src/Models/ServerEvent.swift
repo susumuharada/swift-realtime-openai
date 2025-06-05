@@ -1,28 +1,28 @@
 import Foundation
 
 public enum ServerEvent: Sendable {
-	public struct ErrorEvent: Decodable, Sendable {
+	public struct ErrorEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// Details of the error.
 		public let error: ServerError
 	}
 
-	public struct SessionEvent: Decodable, Sendable {
+	public struct SessionEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The session resource.
 		public let session: Session
 	}
 
-    public struct TranscriptionSessionEvent: Decodable, Sendable {
+    public struct TranscriptionSessionEvent: Codable, Sendable {
         /// The unique ID of the server event.
         public let eventId: String
         /// The session resource.
         public let session: TranscriptionSession
     }
 
-	public struct ConversationCreatedEvent: Decodable, Sendable {
+	public struct ConversationCreatedEvent: Codable, Sendable {
 		public struct Conversation: Codable, Sendable {
 			/// The unique ID of the conversation.
 			public let id: String
@@ -34,7 +34,7 @@ public enum ServerEvent: Sendable {
 		public let conversation: Conversation
 	}
 
-	public struct InputAudioBufferCommittedEvent: Decodable, Sendable {
+	public struct InputAudioBufferCommittedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the preceding item after which the new item will be inserted.
@@ -43,12 +43,12 @@ public enum ServerEvent: Sendable {
 		public let itemId: String
 	}
 
-	public struct InputAudioBufferClearedEvent: Decodable, Sendable {
+	public struct InputAudioBufferClearedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 	}
 
-	public struct InputAudioBufferSpeechStartedEvent: Decodable, Sendable {
+	public struct InputAudioBufferSpeechStartedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// Milliseconds since the session started when speech was detected.
@@ -57,7 +57,7 @@ public enum ServerEvent: Sendable {
 		public let itemId: String
 	}
 
-	public struct InputAudioBufferSpeechStoppedEvent: Decodable, Sendable {
+	public struct InputAudioBufferSpeechStoppedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// Milliseconds since the session started when speech stopped.
@@ -66,7 +66,7 @@ public enum ServerEvent: Sendable {
 		public let itemId: String
 	}
 
-	public struct ConversationItemCreatedEvent: Decodable, Sendable {
+	public struct ConversationItemCreatedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the preceding item.
@@ -75,7 +75,7 @@ public enum ServerEvent: Sendable {
 		public let item: Item
 	}
 
-	public struct ConversationItemInputAudioTranscriptionCompletedEvent: Decodable, Sendable {
+	public struct ConversationItemInputAudioTranscriptionCompletedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the user message item.
@@ -86,7 +86,7 @@ public enum ServerEvent: Sendable {
 		public let transcript: String
 	}
 
-	public struct ConversationItemInputAudioTranscriptionDeltaEvent: Decodable, Sendable {
+	public struct ConversationItemInputAudioTranscriptionDeltaEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the user message item.
@@ -97,7 +97,7 @@ public enum ServerEvent: Sendable {
 		public let delta: String
 	}
 
-	public struct ConversationItemInputAudioTranscriptionFailedEvent: Decodable, Sendable {
+	public struct ConversationItemInputAudioTranscriptionFailedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the user message item.
@@ -108,7 +108,7 @@ public enum ServerEvent: Sendable {
 		public let error: ServerError
 	}
 
-	public struct ConversationItemTruncatedEvent: Decodable, Sendable {
+	public struct ConversationItemTruncatedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the assistant message item that was truncated.
@@ -119,35 +119,35 @@ public enum ServerEvent: Sendable {
 		public let audioEndMs: Int
 	}
 
-	public struct ConversationItemDeletedEvent: Decodable, Sendable {
+	public struct ConversationItemDeletedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the item that was deleted.
 		public let itemId: String
 	}
 
-	public struct OutputAudioBufferStartedEvent: Decodable, Sendable {
+	public struct OutputAudioBufferStartedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
 		public let responseId: String
 	}
 
-	public struct OutputAudioBufferStoppedEvent: Decodable, Sendable {
+	public struct OutputAudioBufferStoppedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
 		public let responseId: String
 	}
 
-	public struct ResponseEvent: Decodable, Sendable {
+	public struct ResponseEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The response resource.
 		public let response: Response
 	}
 
-	public struct ResponseOutputItemAddedEvent: Decodable, Sendable {
+	public struct ResponseOutputItemAddedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response to which the item belongs.
@@ -158,7 +158,7 @@ public enum ServerEvent: Sendable {
 		public let item: Item
 	}
 
-	public struct ResponseOutputItemDoneEvent: Decodable, Sendable {
+	public struct ResponseOutputItemDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response to which the item belongs.
@@ -169,7 +169,7 @@ public enum ServerEvent: Sendable {
 		public let item: Item
 	}
 
-	public struct ResponseContentPartAddedEvent: Decodable, Sendable {
+	public struct ResponseContentPartAddedEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -184,7 +184,7 @@ public enum ServerEvent: Sendable {
 		public let part: Item.ContentPart
 	}
 
-	public struct ResponseContentPartDoneEvent: Decodable, Sendable {
+	public struct ResponseContentPartDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -199,7 +199,7 @@ public enum ServerEvent: Sendable {
 		public let part: Item.ContentPart
 	}
 
-	public struct ResponseTextDeltaEvent: Decodable, Sendable {
+	public struct ResponseTextDeltaEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -214,7 +214,7 @@ public enum ServerEvent: Sendable {
 		public let delta: String
 	}
 
-	public struct ResponseTextDoneEvent: Decodable, Sendable {
+	public struct ResponseTextDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -229,7 +229,7 @@ public enum ServerEvent: Sendable {
 		public let text: String
 	}
 
-	public struct ResponseAudioTranscriptDeltaEvent: Decodable, Sendable {
+	public struct ResponseAudioTranscriptDeltaEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -244,7 +244,7 @@ public enum ServerEvent: Sendable {
 		public let delta: String
 	}
 
-	public struct ResponseAudioTranscriptDoneEvent: Decodable, Sendable {
+	public struct ResponseAudioTranscriptDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -274,7 +274,7 @@ public enum ServerEvent: Sendable {
 		public let delta: Data
 	}
 
-	public struct ResponseAudioDoneEvent: Decodable, Sendable {
+	public struct ResponseAudioDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -287,7 +287,7 @@ public enum ServerEvent: Sendable {
 		public let contentIndex: Int
 	}
 
-	public struct ResponseFunctionCallArgumentsDeltaEvent: Decodable, Sendable {
+	public struct ResponseFunctionCallArgumentsDeltaEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -302,7 +302,7 @@ public enum ServerEvent: Sendable {
 		public let delta: String
 	}
 
-	public struct ResponseFunctionCallArgumentsDoneEvent: Decodable, Sendable {
+	public struct ResponseFunctionCallArgumentsDoneEvent: Codable, Sendable {
 		/// The unique ID of the server event.
 		public let eventId: String
 		/// The ID of the response.
@@ -317,7 +317,7 @@ public enum ServerEvent: Sendable {
 		public let arguments: String
 	}
 
-	public struct RateLimitsUpdatedEvent: Decodable, Sendable {
+	public struct RateLimitsUpdatedEvent: Codable, Sendable {
 		public struct RateLimit: Codable, Sendable {
 			/// The name of the rate limit
 			public let name: String
@@ -403,6 +403,42 @@ public enum ServerEvent: Sendable {
 	case rateLimitsUpdated(RateLimitsUpdatedEvent)
 }
 
+enum ServerEventType: String {
+    case error = "error"
+    case sessionCreated = "session.created"
+    case transcriptionSessionCreated = "transcription_session.created"
+    case sessionUpdated = "session.updated"
+    case transcriptionSessionUpdated = "transcription_session.updated"
+    case conversationCreated = "conversation.created"
+    case inputAudioBufferCommitted = "input_audio_buffer.committed"
+    case inputAudioBufferCleared = "input_audio_buffer.cleared"
+    case inputAudioBufferSpeechStarted = "input_audio_buffer.speech_started"
+    case inputAudioBufferSpeechStopped = "input_audio_buffer.speech_stopped"
+    case conversationItemCreated = "conversation.item.created"
+    case conversationItemInputAudioTranscriptionCompleted = "conversation.item.input_audio_transcription.completed"
+    case conversationItemInputAudioTranscriptionDelta = "conversation.item.input_audio_transcription.delta"
+    case conversationItemInputAudioTranscriptionFailed = "conversation.item.input_audio_transcription.failed"
+    case conversationItemTruncated = "conversation.item.truncated"
+    case conversationItemDeleted = "conversation.item.deleted"
+    case outputAudioBufferStarted = "output_audio_buffer.started"
+    case outputAudioBufferStopped = "output_audio_buffer.stopped"
+    case responseCreated = "response.created"
+    case responseDone = "response.done"
+    case responseOutputItemAdded = "response.output_item.added"
+    case responseOutputItemDone = "response.output_item.done"
+    case responseContentPartAdded = "response.content_part.added"
+    case responseContentPartDone = "response.content_part.done"
+    case responseTextDelta = "response.text.delta"
+    case responseTextDone = "response.text.done"
+    case responseAudioTranscriptDelta = "response.audio_transcript.delta"
+    case responseAudioTranscriptDone = "response.audio_transcript.done"
+    case responseAudioDelta = "response.audio.delta"
+    case responseAudioDone = "response.audio.done"
+    case responseFunctionCallArgumentsDelta = "response.function_call_arguments.delta"
+    case responseFunctionCallArgumentsDone = "response.function_call_arguments.done"
+    case rateLimitsUpdated = "rate_limits.updated"
+}
+
 extension ServerEvent: Identifiable {
 	public var id: String {
 		switch self {
@@ -476,89 +512,212 @@ extension ServerEvent: Identifiable {
 	}
 }
 
-extension ServerEvent: Decodable {
+extension ServerEvent: Codable {
 	private enum CodingKeys: String, CodingKey {
 		case type
 	}
 
 	public init(from decoder: any Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let eventType = try container.decode(String.self, forKey: .type)
+		let eventTypeString = try container.decode(String.self, forKey: .type)
+        let eventType = ServerEventType(rawValue: eventTypeString)
 
 		switch eventType {
-			case "error":
+            case .error:
 				self = try .error(ErrorEvent(from: decoder))
-			case "session.created":
+            case .sessionCreated:
 				self = try .sessionCreated(SessionEvent(from: decoder))
-            case "transcription_session.created":
+            case .transcriptionSessionCreated:
                 self = try .transcriptionSessionCreated(TranscriptionSessionEvent(from: decoder))
-			case "session.updated":
+            case .sessionUpdated:
 				self = try .sessionUpdated(SessionEvent(from: decoder))
-            case "transcription_session.updated":
+            case .transcriptionSessionUpdated:
                 self = try .transcriptionSessionUpdated(TranscriptionSessionEvent(from: decoder))
-			case "conversation.created":
+			case .conversationCreated:
 				self = try .conversationCreated(ConversationCreatedEvent(from: decoder))
-			case "input_audio_buffer.committed":
+			case .inputAudioBufferCommitted:
 				self = try .inputAudioBufferCommitted(InputAudioBufferCommittedEvent(from: decoder))
-			case "input_audio_buffer.cleared":
+			case .inputAudioBufferCleared:
 				self = try .inputAudioBufferCleared(InputAudioBufferClearedEvent(from: decoder))
-			case "input_audio_buffer.speech_started":
+			case .inputAudioBufferSpeechStarted:
 				self = try .inputAudioBufferSpeechStarted(InputAudioBufferSpeechStartedEvent(from: decoder))
-			case "input_audio_buffer.speech_stopped":
+			case .inputAudioBufferSpeechStopped:
 				self = try .inputAudioBufferSpeechStopped(InputAudioBufferSpeechStoppedEvent(from: decoder))
-			case "conversation.item.created":
+			case .conversationItemCreated:
 				self = try .conversationItemCreated(ConversationItemCreatedEvent(from: decoder))
-			case "conversation.item.input_audio_transcription.completed":
+			case .conversationItemInputAudioTranscriptionCompleted:
 				self = try .conversationItemInputAudioTranscriptionCompleted(ConversationItemInputAudioTranscriptionCompletedEvent(from: decoder))
-			case "conversation.item.input_audio_transcription.delta":
+			case .conversationItemInputAudioTranscriptionDelta:
 				self = try .conversationItemInputAudioTranscriptionDelta(ConversationItemInputAudioTranscriptionDeltaEvent(from: decoder))
-			case "conversation.item.input_audio_transcription.failed":
+			case .conversationItemInputAudioTranscriptionFailed:
 				self = try .conversationItemInputAudioTranscriptionFailed(ConversationItemInputAudioTranscriptionFailedEvent(from: decoder))
-			case "conversation.item.truncated":
+			case .conversationItemTruncated:
 				self = try .conversationItemTruncated(ConversationItemTruncatedEvent(from: decoder))
-			case "conversation.item.deleted":
+			case .conversationItemDeleted:
 				self = try .conversationItemDeleted(ConversationItemDeletedEvent(from: decoder))
-			case "output_audio_buffer.started":
+			case .outputAudioBufferStarted:
 				self = try .outputAudioBufferStarted(OutputAudioBufferStartedEvent(from: decoder))
-			case "output_audio_buffer.stopped":
+			case .outputAudioBufferStopped:
 				self = try .outputAudioBufferStopped(OutputAudioBufferStoppedEvent(from: decoder))
-			case "response.created":
+			case .responseCreated:
 				self = try .responseCreated(ResponseEvent(from: decoder))
-			case "response.done":
+			case .responseDone:
 				self = try .responseDone(ResponseEvent(from: decoder))
-			case "response.output_item.added":
+			case .responseOutputItemAdded:
 				self = try .responseOutputItemAdded(ResponseOutputItemAddedEvent(from: decoder))
-			case "response.output_item.done":
+			case .responseOutputItemDone:
 				self = try .responseOutputItemDone(ResponseOutputItemDoneEvent(from: decoder))
-			case "response.content_part.added":
+			case .responseContentPartAdded:
 				self = try .responseContentPartAdded(ResponseContentPartAddedEvent(from: decoder))
-			case "response.content_part.done":
+			case .responseContentPartDone:
 				self = try .responseContentPartDone(ResponseContentPartDoneEvent(from: decoder))
-			case "response.text.delta":
+			case .responseTextDelta:
 				self = try .responseTextDelta(ResponseTextDeltaEvent(from: decoder))
-			case "response.text.done":
+			case .responseTextDone:
 				self = try .responseTextDone(ResponseTextDoneEvent(from: decoder))
-			case "response.audio_transcript.delta":
+			case .responseAudioTranscriptDelta:
 				self = try .responseAudioTranscriptDelta(ResponseAudioTranscriptDeltaEvent(from: decoder))
-			case "response.audio_transcript.done":
+			case .responseAudioTranscriptDone:
 				self = try .responseAudioTranscriptDone(ResponseAudioTranscriptDoneEvent(from: decoder))
-			case "response.audio.delta":
+			case .responseAudioDelta:
 				self = try .responseAudioDelta(ResponseAudioDeltaEvent(from: decoder))
-			case "response.audio.done":
+			case .responseAudioDone:
 				self = try .responseAudioDone(ResponseAudioDoneEvent(from: decoder))
-			case "response.function_call_arguments.delta":
+			case .responseFunctionCallArgumentsDelta:
 				self = try .responseFunctionCallArgumentsDelta(ResponseFunctionCallArgumentsDeltaEvent(from: decoder))
-			case "response.function_call_arguments.done":
+			case .responseFunctionCallArgumentsDone:
 				self = try .responseFunctionCallArgumentsDone(ResponseFunctionCallArgumentsDoneEvent(from: decoder))
-			case "rate_limits.updated":
+			case .rateLimitsUpdated:
 				self = try .rateLimitsUpdated(RateLimitsUpdatedEvent(from: decoder))
-			default:
-				throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(eventType)")
-		}
+			case nil:
+				throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(eventTypeString)")
+			}
 	}
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .error(let event):
+            try container.encode(ServerEventType.error.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .sessionCreated(let event):
+            try container.encode(ServerEventType.sessionCreated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .transcriptionSessionCreated(let event):
+            try container.encode(ServerEventType.transcriptionSessionCreated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .sessionUpdated(let event):
+            try container.encode(ServerEventType.sessionUpdated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .transcriptionSessionUpdated(let event):
+            try container.encode(ServerEventType.transcriptionSessionUpdated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationCreated(let event):
+            try container.encode(ServerEventType.conversationCreated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .inputAudioBufferCommitted(let event):
+            try container.encode(ServerEventType.inputAudioBufferCommitted.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .inputAudioBufferCleared(let event):
+            try container.encode(ServerEventType.inputAudioBufferCleared.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .inputAudioBufferSpeechStarted(let event):
+            try container.encode(ServerEventType.inputAudioBufferSpeechStarted.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .inputAudioBufferSpeechStopped(let event):
+            try container.encode(ServerEventType.inputAudioBufferSpeechStopped.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemCreated(let event):
+            try container.encode(ServerEventType.conversationItemCreated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemInputAudioTranscriptionCompleted(let event):
+            try container.encode(ServerEventType.conversationItemInputAudioTranscriptionCompleted.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemInputAudioTranscriptionDelta(let event):
+            try container.encode(ServerEventType.conversationItemInputAudioTranscriptionDelta.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemInputAudioTranscriptionFailed(let event):
+            try container.encode(ServerEventType.conversationItemInputAudioTranscriptionFailed.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemTruncated(let event):
+            try container.encode(ServerEventType.conversationItemTruncated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .conversationItemDeleted(let event):
+            try container.encode(ServerEventType.conversationItemDeleted.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .outputAudioBufferStarted(let event):
+            try container.encode(ServerEventType.outputAudioBufferStarted.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .outputAudioBufferStopped(let event):
+            try container.encode(ServerEventType.outputAudioBufferStopped.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseCreated(let event):
+            try container.encode(ServerEventType.responseCreated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseDone(let event):
+            try container.encode(ServerEventType.responseDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseOutputItemAdded(let event):
+            try container.encode(ServerEventType.responseOutputItemAdded.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseOutputItemDone(let event):
+            try container.encode(ServerEventType.responseOutputItemDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseContentPartAdded(let event):
+            try container.encode(ServerEventType.responseContentPartAdded.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseContentPartDone(let event):
+            try container.encode(ServerEventType.responseContentPartDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseTextDelta(let event):
+            try container.encode(ServerEventType.responseTextDelta.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseTextDone(let event):
+            try container.encode(ServerEventType.responseTextDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseAudioTranscriptDelta(let event):
+            try container.encode(ServerEventType.responseAudioTranscriptDelta.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseAudioTranscriptDone(let event):
+            try container.encode(ServerEventType.responseAudioTranscriptDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseAudioDelta(let event):
+            try container.encode(ServerEventType.responseAudioDelta.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseAudioDone(let event):
+            try container.encode(ServerEventType.responseAudioDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseFunctionCallArgumentsDelta(let event):
+            try container.encode(ServerEventType.responseFunctionCallArgumentsDelta.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .responseFunctionCallArgumentsDone(let event):
+            try container.encode(ServerEventType.responseFunctionCallArgumentsDone.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        case .rateLimitsUpdated(let event):
+            try container.encode(ServerEventType.rateLimitsUpdated.rawValue, forKey: .type)
+            try event.encode(to: encoder)
+        }
+    }
 }
 
-extension ServerEvent.ResponseAudioDeltaEvent: Decodable {
+extension ServerEvent: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+        do {
+            let jsonData = try encoder.encode(self)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            } else {
+                return "Failed to convert JSON data to string"
+            }
+        } catch {
+            return "Failed to encode ServerEvent to JSON for debugDescription: \(error)"
+        }
+    }
+}
+
+extension ServerEvent.ResponseAudioDeltaEvent: Codable {
 	private enum CodingKeys: CodingKey {
 		case eventId
 		case responseId
@@ -582,4 +741,14 @@ extension ServerEvent.ResponseAudioDeltaEvent: Decodable {
 		}
 		delta = decodedDelta
 	}
+    
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventId, forKey: .eventId)
+        try container.encode(responseId, forKey: .responseId)
+        try container.encode(itemId, forKey: .itemId)
+        try container.encode(outputIndex, forKey: .outputIndex)
+        try container.encode(contentIndex, forKey: .contentIndex)
+        try container.encode(delta.base64EncodedString(), forKey: .delta)
+    }
 }

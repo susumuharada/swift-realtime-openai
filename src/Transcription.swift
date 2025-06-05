@@ -250,7 +250,7 @@ public extension Transcription {
 /// Event handling private API
 private extension Transcription {
     @MainActor func handleEvent(_ event: ServerEvent) {
-        Logger.transcription.log("Handling event:\n\(String(describing: event))")
+        Logger.transcription.log("Handling event:\n\(event.debugDescription)")
         switch event {
         case let .error(event):
             errorStream.yield(event.error)
