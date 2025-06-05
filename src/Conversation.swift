@@ -110,8 +110,9 @@ public final class Conversation: @unchecked Sendable {
                 try await updateSession { session in
                     Logger.transcription.log("Updating prompt")
                     session.instructions = "You’re a stenographer. Transcribe my words into a running document text, appending each utterance. If an utterance sounds like an edit command, edit the running text accordingly. Sometimes, I’ll respeak a portion of the document text to replace an existing part. After each utterance, present the updated document text verbatim. If I seem to edit the text but the target is unclear, keep the document unchanged and ask for clarification. For example, if I say ‘change coffee to tea’ and there are multiple ‘coffee’ in the document, ask ‘which coffee did you mean?’ and replace the second instance with ‘tea’. If you assumed an edit but I say ‘that should have been transcribed’, undo the edit and transcribe the utterance. Conversely, if you assumed a transcription but I say ‘that was meant as an edit’, interpret it as an edit. If the intent is unclear, keep the document unchanged and ask for clarification. If I spell out a word or name, try to find the text in the document text that is phonetically similar and if found, replace it with the spelled word with any casing adjustments made as appropriate. Once I make such an edit, if I transcribe the same word, apply the new spelling automatically."
-                    var audioTranscription = Session.InputAudioTranscription(model: .gpt4o, language: "en", prompt: "Expect a series of dictation utterances, with potentially some edit utterances interspersed, as well as spelling corrections.")
+                    let audioTranscription = Session.InputAudioTranscription(model: .gpt4o, language: "en", prompt: "Expect a series of dictation utterances, with potentially some edit utterances interspersed, as well as spelling corrections.")
                     session.inputAudioTranscription = audioTranscription
+                    session.modalities = [.text]
                 }
             }
         }
