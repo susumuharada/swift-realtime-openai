@@ -19,7 +19,7 @@ public final class Transcription: @unchecked Sendable {
     @MainActor public private(set) var id: String?
 
     /// The current session for this conversation.
-    @MainActor public private(set) var session: Session?
+    @MainActor public private(set) var session: TranscriptionSession?
 
     /// The accumulated transcript.
     @MainActor public private(set) var transcript: String = ""
@@ -86,10 +86,8 @@ public final class Transcription: @unchecked Sendable {
             try await whenConnected {
                 print("Transcription connected")
                 try await updateSession { session in
-                    print("Updating instructions")
-                    session.instructions = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
-
-                    var audioTranscription = Session.InputAudioTranscription(model: .gpt4o)
+                    print("Updating prompt")
+                    var audioTranscription = TranscriptionSession.InputAudioTranscription()
                     audioTranscription.prompt = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
                     session.inputAudioTranscription = audioTranscription
                 }
@@ -133,7 +131,7 @@ public final class Transcription: @unchecked Sendable {
 
     /// Make changes to the current session
     /// Note that this will fail if the session hasn't started yet. Use `whenConnected` to ensure the session is ready.
-    public func updateSession(withChanges callback: (inout Session) -> Void) async throws {
+    public func updateSession(withChanges callback: (inout TranscriptionSession) -> Void) async throws {
         guard var session = await session else {
             throw ConversationError.sessionNotFound
         }
@@ -144,12 +142,12 @@ public final class Transcription: @unchecked Sendable {
     }
 
     /// Set the configuration of the current session
-    public func setSession(_ session: Session) async throws {
+    public func setSession(_ session: TranscriptionSession) async throws {
         // update endpoint errors if we include the session id
         var session = session
         session.id = nil
 
-        try await client.send(event: .updateSession(session))
+        try await client.send(event: .updateTranscriptionSession(session))
     }
 
     /// Send a client event to the server.
@@ -255,10 +253,15 @@ private extension Transcription {
         switch event {
         case let .error(event):
             errorStream.yield(event.error)
-        case let .sessionCreated(event):
+//        case let .sessionCreated(event):
+//            connected = true
+//            session = event.session
+        case let .transcriptionSessionCreated(event):
             connected = true
             session = event.session
-        case let .sessionUpdated(event):
+//        case let .sessionUpdated(event):
+//            session = event.session
+        case let .transcriptionSessionUpdated(event):
             session = event.session
         case let .conversationCreated(event):
             id = event.conversation.id

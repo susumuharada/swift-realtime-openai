@@ -10,6 +10,15 @@ public enum ClientEvent: Equatable, Sendable {
 		private let type = "session.update"
 	}
 
+    public struct TranscriptionSessionUpdateEvent: Encodable, Equatable, Sendable {
+        /// Optional client-generated ID used to identify this event.
+        public var eventId: String?
+        /// Session configuration to update.
+        public var session: TranscriptionSession
+
+        private let type = "transcription_session.update"
+    }
+
 	public struct InputAudioBufferAppendEvent: Encodable, Equatable, Sendable {
 		/// Optional client-generated ID used to identify this event.
 		public var eventId: String?
@@ -86,8 +95,10 @@ public enum ClientEvent: Equatable, Sendable {
 		private let type = "response.cancel"
 	}
 
-	/// Send this event to update the session’s default configuration.
-	case updateSession(SessionUpdateEvent)
+    /// Send this event to update the session’s default configuration.
+    case updateSession(SessionUpdateEvent)
+    /// Send this event to update the session’s default configuration.
+    case updateTranscriptionSession(TranscriptionSessionUpdateEvent)
 	/// Send this event to append audio bytes to the input audio buffer.
 	case appendInputAudioBuffer(InputAudioBufferAppendEvent)
 	/// Send this event to commit audio bytes to a user message.
@@ -110,6 +121,10 @@ public extension ClientEvent {
 	static func updateSession(id: String? = nil, _ session: Session) -> Self {
 		.updateSession(SessionUpdateEvent(eventId: id, session: session))
 	}
+
+    static func updateTranscriptionSession(id: String? = nil, _ session: TranscriptionSession) -> Self {
+        .updateTranscriptionSession(TranscriptionSessionUpdateEvent(eventId: id, session: session))
+    }
 
 	static func appendInputAudioBuffer(id: String? = nil, encoding audio: Data) -> Self {
 		.appendInputAudioBuffer(InputAudioBufferAppendEvent(eventId: id, audio: audio.base64EncodedString()))
@@ -153,6 +168,8 @@ extension ClientEvent: Encodable {
 		switch self {
 			case let .updateSession(event):
 				try event.encode(to: encoder)
+            case let .updateTranscriptionSession(event):
+                try event.encode(to: encoder)
 			case let .appendInputAudioBuffer(event):
 				try event.encode(to: encoder)
 			case let .commitInputAudioBuffer(event):

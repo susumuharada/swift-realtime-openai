@@ -343,6 +343,8 @@ public enum ServerEvent: Sendable {
     case transcriptionSessionCreated(TranscriptionSessionEvent)
 	/// Returned when a session is updated.
 	case sessionUpdated(SessionEvent)
+    /// Returned when a transcription session is updated.
+    case transcriptionSessionUpdated(TranscriptionSessionEvent)
 	/// Returned when a conversation is created. Emitted right after session creation.
 	case conversationCreated(ConversationCreatedEvent)
 	/// Returned when an input audio buffer is committed, either by the client or automatically in server VAD mode.
@@ -412,6 +414,8 @@ extension ServerEvent: Identifiable {
                 return event.eventId
 			case let .sessionUpdated(event):
 				return event.eventId
+            case let .transcriptionSessionUpdated(event):
+                return event.eventId
 			case let .conversationCreated(event):
 				return event.eventId
 			case let .inputAudioBufferCommitted(event):
@@ -486,10 +490,12 @@ extension ServerEvent: Decodable {
 				self = try .error(ErrorEvent(from: decoder))
 			case "session.created":
 				self = try .sessionCreated(SessionEvent(from: decoder))
-			case "session.updated":
-				self = try .sessionUpdated(SessionEvent(from: decoder))
             case "transcription_session.created":
                 self = try .transcriptionSessionCreated(TranscriptionSessionEvent(from: decoder))
+			case "session.updated":
+				self = try .sessionUpdated(SessionEvent(from: decoder))
+            case "transcription_session.updated":
+                self = try .transcriptionSessionUpdated(TranscriptionSessionEvent(from: decoder))
 			case "conversation.created":
 				self = try .conversationCreated(ConversationCreatedEvent(from: decoder))
 			case "input_audio_buffer.committed":
