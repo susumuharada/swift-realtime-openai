@@ -7,6 +7,7 @@
 
 import Foundation
 @preconcurrency import AVFoundation
+import OSLog
 
 final class AudioHandler: @unchecked Sendable {
     var onAudioDeltaFromUser: (Data) -> Void = { _ in }
@@ -51,7 +52,7 @@ final class AudioHandler: @unchecked Sendable {
     /// > Warning: Make sure to handle the case where the user denies microphone access.
     @MainActor func startListening() throws {
         guard !isListening else { return }
-        print("AudioHandler startListening")
+        Logger.audioHandler.log("AudioHandler startListening")
         if !handlingVoice { try startHandlingVoice() }
 
         Task.detached { [audioEngine] in
@@ -67,7 +68,7 @@ final class AudioHandler: @unchecked Sendable {
     /// This won't stop playing back model responses. To fully stop handling voice conversations, call `stopHandlingVoice`.
     @MainActor func stopListening() {
         guard isListening else { return }
-        print("AudioHandler stopListening")
+        Logger.audioHandler.log("AudioHandler stopListening")
         audioEngine.inputNode.removeTap(onBus: 0)
         isListening = false
     }
@@ -75,7 +76,7 @@ final class AudioHandler: @unchecked Sendable {
     /// Handle the playback of audio responses from the model.
     @MainActor func startHandlingVoice() throws {
         guard !handlingVoice else { return }
-        print("AudioHandler startHandlingVoice")
+        Logger.audioHandler.log("AudioHandler startHandlingVoice")
 
         guard let converter = AVAudioConverter(from: audioEngine.inputNode.outputFormat(forBus: 0), to: desiredFormat) else {
             throw ConversationError.converterInitializationFailed
@@ -101,7 +102,7 @@ final class AudioHandler: @unchecked Sendable {
 
             handlingVoice = true
         } catch {
-            print("Failed to enable audio engine: \(error)")
+            Logger.audioHandler.error("Failed to enable audio engine: \(error)")
 
             audioEngine.disconnectNodeInput(playerNode)
             audioEngine.disconnectNodeOutput(playerNode)
@@ -114,7 +115,7 @@ final class AudioHandler: @unchecked Sendable {
     /// This lets the model know that the user didn't hear the full response.
     @MainActor func interruptSpeech(_ perform: (AudioHandler) -> Void) {
         guard !isInterrupting else { return }
-        print("AudioHandler interruptSpeech")
+        Logger.audioHandler.log("AudioHandler interruptSpeech")
         isInterrupting = true
 
         perform(self)
@@ -126,7 +127,7 @@ final class AudioHandler: @unchecked Sendable {
 
     @MainActor func stopHandlingVoice() {
         guard handlingVoice else { return }
-        print("AudioHandler stopHandlingVoice")
+        Logger.audioHandler.log("AudioHandler stopHandlingVoice")
 
         Self.cleanUpAudio(playerNode: playerNode, audioEngine: audioEngine)
 
@@ -156,19 +157,19 @@ final class AudioHandler: @unchecked Sendable {
 
     func queueAudioSample(_ event: ServerEvent.ResponseAudioDeltaEvent) {
         guard let buffer = AVAudioPCMBuffer.fromData(event.delta, format: desiredFormat) else {
-            print("Failed to create audio buffer.")
+            Logger.audioHandler.error("Failed to create audio buffer.")
             return
         }
 
         guard let converter = apiConverter.lazy({ AVAudioConverter(from: buffer.format, to: playerNode.outputFormat(forBus: 0)) }) else {
-            print("Failed to create audio converter.")
+            Logger.audioHandler.error("Failed to create audio converter.")
             return
         }
 
         let outputFrameCapacity = AVAudioFrameCount(ceil(converter.outputFormat.sampleRate / buffer.format.sampleRate) * Double(buffer.frameLength))
 
         guard let sample = convertBuffer(buffer: buffer, using: converter, capacity: outputFrameCapacity) else {
-            print("Failed to convert buffer.")
+            Logger.audioHandler.error("Failed to convert buffer.")
             return
         }
 
@@ -195,7 +196,7 @@ extension AudioHandler {
         let ratio = desiredFormat.sampleRate / buffer.format.sampleRate
 
         guard let convertedBuffer = convertBuffer(buffer: buffer, using: userConverter.get()!, capacity: AVAudioFrameCount(Double(buffer.frameLength) * ratio)) else {
-            print("Buffer conversion failed.")
+            Logger.audioHandler.error("Buffer conversion failed.")
             return
         }
 
@@ -203,9 +204,6 @@ extension AudioHandler {
         let audioData = Data(bytes: sampleBytes, count: Int(convertedBuffer.audioBufferList.pointee.mBuffers.mDataByteSize))
 
         onAudioDeltaFromUser(audioData)
-//        Task {
-//            try await send(audioDelta: audioData)
-//        }
     }
 
     private func convertBuffer(buffer: AVAudioPCMBuffer, using converter: AVAudioConverter, capacity: AVAudioFrameCount) -> AVAudioPCMBuffer? {
@@ -214,7 +212,7 @@ extension AudioHandler {
         }
 
         guard let convertedBuffer = AVAudioPCMBuffer(pcmFormat: converter.outputFormat, frameCapacity: capacity) else {
-            print("Failed to create converted audio buffer.")
+            Logger.audioHandler.error("Failed to create converted audio buffer.")
             return nil
         }
 
@@ -234,7 +232,7 @@ extension AudioHandler {
 
         if status == .error {
             if let error = error {
-                print("Error during conversion: \(error.localizedDescription)")
+                Logger.audioHandler.error("Error during conversion: \(error.localizedDescription)")
             }
             return nil
         }

@@ -1,5 +1,6 @@
 import Foundation
 @preconcurrency import AVFoundation
+import OSLog
 
 public enum ConversationError: Error {
 	case sessionNotFound
@@ -209,10 +210,10 @@ public extension Conversation {
             {
                 Task { [client] in
                     do {
-                        print("Sending truncateConversationItem")
+                        Logger.conversation.log("Sending truncateConversationItem")
                         try await client.send(event: .truncateConversationItem(forItem: itemID, atAudioMs: audioTimeInMiliseconds))
                     } catch {
-                        print("Failed to send automatic truncation event: \(error)")
+                        Logger.conversation.error("Failed to send automatic truncation event: \(error)")
                     }
                 }
             }
@@ -247,7 +248,7 @@ public extension Conversation {
 /// Event handling private API
 private extension Conversation {
 	@MainActor func handleEvent(_ event: ServerEvent) {
-        print("Handling event \(event)")
+        Logger.conversation.log("Handling event:\n\(String(describing: event))")
 		switch event {
 			case let .error(event):
 				errorStream.yield(event.error)

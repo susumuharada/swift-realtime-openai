@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 @preconcurrency import AVFoundation
+import OSLog
 
 @Observable
 public final class Transcription: @unchecked Sendable {
@@ -49,16 +50,16 @@ public final class Transcription: @unchecked Sendable {
 
         let events = client.events
         task = Task.detached { [weak self] in
-            print("Transcription: awaiting for event on stream")
+            Logger.transcription.log("Transcription: awaiting for event on stream")
             do {
                 for try await event in events {
                     guard !Task.isCancelled else { break }
 
                     await self?.handleEvent(event)
                 }
-                print("Transcription: event stream closed?")
+                Logger.transcription.log("Transcription: event stream closed?")
             } catch {
-                print("ERROR: Transcription event stream: \(error)")
+                Logger.transcription.error("ERROR: Transcription event stream: \(error)")
             }
 
             await MainActor.run { [weak self] in
@@ -84,9 +85,9 @@ public final class Transcription: @unchecked Sendable {
 
         Task {
             try await whenConnected {
-                print("Transcription connected")
+                Logger.transcription.log("Transcription connected")
                 try await updateSession { session in
-                    print("Updating prompt")
+                    Logger.transcription.log("Updating prompt")
                     var audioTranscription = TranscriptionSession.InputAudioTranscription()
                     audioTranscription.prompt = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
                     session.inputAudioTranscription = audioTranscription
@@ -112,10 +113,10 @@ public final class Transcription: @unchecked Sendable {
 
     /// Wait for the connection to be established
     @MainActor public func waitForConnection() async {
-        print("Waiting for connection")
+        Logger.transcription.log("Waiting for connection")
         while true {
             if connected {
-                print("Connected")
+                Logger.transcription.log("Connected")
                 return
             }
 
@@ -211,10 +212,10 @@ public extension Transcription {
             {
                 Task { [client] in
                     do {
-                        print("Sending truncateConversationItem")
+                        Logger.transcription.log("Sending truncateConversationItem")
                         try await client.send(event: .truncateConversationItem(forItem: itemID, atAudioMs: audioTimeInMiliseconds))
                     } catch {
-                        print("Failed to send automatic truncation event: \(error)")
+                        Logger.transcription.error("Failed to send automatic truncation event: \(error)")
                     }
                 }
             }
@@ -249,7 +250,7 @@ public extension Transcription {
 /// Event handling private API
 private extension Transcription {
     @MainActor func handleEvent(_ event: ServerEvent) {
-        print("Handling event \(event)")
+        Logger.transcription.log("Handling event:\n\(String(describing: event))")
         switch event {
         case let .error(event):
             errorStream.yield(event.error)
@@ -270,10 +271,10 @@ private extension Transcription {
 //        case let .conversationItemDeleted(event):
 //            entries.removeAll { $0.id == event.itemId }
         case let .conversationItemInputAudioTranscriptionDelta(event):
-            print("Conversation item input audio transcription delta: '\(event.delta)'")
+            Logger.transcription.log("Conversation item input audio transcription delta: '\(event.delta)'")
             transcript = event.delta
         case let .conversationItemInputAudioTranscriptionCompleted(event):
-            print("Conversation item input audio transcription completed: '\(event.transcript)'")
+            Logger.transcription.log("Conversation item input audio transcription completed: '\(event.transcript)'")
             transcript = event.transcript
 //            updateEvent(id: event.itemId) { message in
 //                guard case let .input_audio(audio) = message.content[event.contentIndex] else { return }
@@ -328,16 +329,16 @@ private extension Transcription {
 //                functionCall.arguments = event.arguments
 //            }
         case .inputAudioBufferSpeechStarted:
-            print("User started speaking")
+            Logger.transcription.log("User started speaking")
             isUserSpeaking = true
 //            if handlingVoice { interruptSpeech() }
         case .inputAudioBufferSpeechStopped:
-            print("User stopped speaking")
+            Logger.transcription.log("User stopped speaking")
             isUserSpeaking = false
         case .inputAudioBufferCommitted:
-            print("Input audio buffer committed")
+            Logger.transcription.log("Input audio buffer committed")
         case .inputAudioBufferCleared:
-            print("Input audio buffer cleared")
+            Logger.transcription.log("Input audio buffer cleared")
 //        case let .responseOutputItemDone(event):
 //            updateEvent(id: event.item.id) { message in
 //                guard case let .message(newMessage) = event.item else { return }

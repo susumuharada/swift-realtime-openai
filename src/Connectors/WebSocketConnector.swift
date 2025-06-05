@@ -2,6 +2,7 @@ import Foundation
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
+import OSLog
 
 public final class WebSocketConnector: Connector, Sendable {
 	@MainActor public private(set) var onDisconnect: (@Sendable () -> Void)? = nil
@@ -21,9 +22,9 @@ public final class WebSocketConnector: Connector, Sendable {
 		let (events, stream) = AsyncThrowingStream.makeStream(of: ServerEvent.self)
 
 		let webSocket = URLSession.shared.webSocketTask(with: request)
-        print("Resuming webSocket task with request \(request)")
+        Logger.webSocketConnector.log("Resuming webSocket task with request \(request)")
 		webSocket.resume()
-        print("Resumed webSocket task")
+        Logger.webSocketConnector.log("Resumed webSocket task")
 
 		task = Task.detached { [webSocket, stream] in
 			var isActive = true
@@ -33,28 +34,31 @@ public final class WebSocketConnector: Connector, Sendable {
 
 			while isActive, webSocket.closeCode == .invalid, !Task.isCancelled {
 				guard webSocket.closeCode == .invalid else {
+                    Logger.webSocketConnector.log("WebSocket closeCode was \(webSocket.closeCode.rawValue), finishing")
 					stream.finish()
 					isActive = false
 					break
 				}
 
 				do {
-                    print("Waiting to receive on web socket")
+                    Logger.webSocketConnector.log("Waiting to receive on web socket")
 					let message = try await webSocket.receive()
 
 					guard case let .string(text) = message, let data = text.data(using: .utf8) else {
 						stream.yield(error: RealtimeAPIError.invalidMessage)
 						continue
 					}
-                    print("Receive message on web socket: '\(text)'")
+                    Logger.webSocketConnector.log("Received message on web socket:\n\(text)")
 
 					try stream.yield(decoder.decode(ServerEvent.self, from: data))
 				} catch {
+                    Logger.webSocketConnector.error("ERROR: \(error)")
 					stream.yield(error: error)
 					isActive = false
 				}
 			}
 
+            Logger.webSocketConnector.log("Cancelling web socket")
 			webSocket.cancel(with: .goingAway, reason: nil)
 		}
 
@@ -73,7 +77,7 @@ public final class WebSocketConnector: Connector, Sendable {
 	public func send(event: ClientEvent) async throws {
         let messageString = try String(data: encoder.encode(event), encoding: .utf8)!
 		let message = URLSessionWebSocketTask.Message.string(messageString)
-        print("Sending over webSocket: \(messageString)")
+        Logger.webSocketConnector.log("Sending over webSocket:\n\(messageString)")
 		try await webSocket.send(message)
 	}
 
