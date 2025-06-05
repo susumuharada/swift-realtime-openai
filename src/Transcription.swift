@@ -328,10 +328,16 @@ private extension Transcription {
 //                functionCall.arguments = event.arguments
 //            }
         case .inputAudioBufferSpeechStarted:
+            print("User started speaking")
             isUserSpeaking = true
 //            if handlingVoice { interruptSpeech() }
         case .inputAudioBufferSpeechStopped:
+            print("User stopped speaking")
             isUserSpeaking = false
+        case .inputAudioBufferCommitted:
+            print("Input audio buffer committed")
+        case .inputAudioBufferCleared:
+            print("Input audio buffer cleared")
 //        case let .responseOutputItemDone(event):
 //            updateEvent(id: event.item.id) { message in
 //                guard case let .message(newMessage) = event.item else { return }
