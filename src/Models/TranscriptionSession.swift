@@ -86,7 +86,7 @@ public struct TranscriptionSession: Codable, Equatable, Sendable {
 	/// The unique ID of the session.
 	public var id: String?
 	/// The set of modalities the model can respond with.
-	public var modalities: [Modality]
+	public var modalities: [Modality]?
 	/// The format of input audio.
 	public var inputAudioFormat: AudioFormat
 	/// Configuration for input audio transcription.
