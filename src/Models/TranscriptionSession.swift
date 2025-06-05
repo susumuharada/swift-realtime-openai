@@ -59,16 +59,13 @@ public struct TranscriptionSession: Codable, Equatable, Sendable {
 		public var prefixPaddingMs: Int?
 		/// Used only for `server_vad` mode. Duration of silence to detect speech stop (in milliseconds).
 		public var silenceDurationMs: Int?
-		/// Whether or not to automatically generate a response when VAD is enabled.
-		public var createResponse: Bool
 		/// Used only for `semantic_vad` mode. The eagerness of the model to respond. `low` will wait longer for the user to continue speaking, `high` will respond more quickly. `auto` is the default and is equivalent to `medium`.
 		public var eagerness: TurnDetectionEagerness?
 
-		public init(type: TurnDetectionType = .serverVad, threshold: Double? = nil, interruptResponse: Bool? = nil, prefixPaddingMs: Int? = nil, silenceDurationMs: Int? = nil, createResponse: Bool = true, eagerness: TurnDetectionEagerness? = nil) {
+		public init(type: TurnDetectionType = .serverVad, threshold: Double? = nil, interruptResponse: Bool? = nil, prefixPaddingMs: Int? = nil, silenceDurationMs: Int? = nil, eagerness: TurnDetectionEagerness? = nil) {
 			self.type = type
 			self.eagerness = eagerness
 			self.threshold = threshold
-			self.createResponse = createResponse
 			self.prefixPaddingMs = prefixPaddingMs
 			self.silenceDurationMs = silenceDurationMs
 			self.interruptResponse = interruptResponse
