@@ -28,6 +28,9 @@ public final class Transcription: @unchecked Sendable {
     /// The accumulated transcript.
     @MainActor public private(set) var transcript: String = ""
 
+    /// The latest response from the system.
+    @MainActor public private(set) var systemResponse: String = ""
+
     /// Whether the conversation is currently connected to the server.
     @MainActor public private(set) var connected: Bool = false
 
@@ -314,7 +317,9 @@ private extension Transcription {
 //
 //                message.content[event.contentIndex] = .audio(.init(audio: audio.audio, transcript: (audio.transcript ?? "") + event.delta))
 //            }
-//        case let .responseAudioTranscriptDone(event):
+        case let .responseAudioTranscriptDone(event):
+            Logger.transcription.log("Response audio transcript done: '\(event.transcript)'")
+            systemResponse = event.transcript
 //            updateEvent(id: event.itemId) { message in
 //                guard case let .audio(audio) = message.content[event.contentIndex] else { return }
 //
