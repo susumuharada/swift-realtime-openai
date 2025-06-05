@@ -22,6 +22,9 @@ public final class Transcription: @unchecked Sendable {
     /// The current session for this conversation.
     @MainActor public private(set) var session: TranscriptionSession?
 
+    /// The most recent utterance.
+    @MainActor public private(set) var utterance: String = ""
+
     /// The accumulated transcript.
     @MainActor public private(set) var transcript: String = ""
 
@@ -88,8 +91,7 @@ public final class Transcription: @unchecked Sendable {
                 Logger.transcription.log("Transcription connected")
                 try await updateSession { session in
                     Logger.transcription.log("Updating prompt")
-                    var audioTranscription = TranscriptionSession.InputAudioTranscription()
-                    audioTranscription.prompt = "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document accordingly. After each utterance, simply read back the entire content of the updated document verbatim without any additional text."
+                    var audioTranscription = TranscriptionSession.InputAudioTranscription(prompt: "You are a stenographer. Your job is to faithfully transcribe what I say, appending each utterance to a running document text, unless an utterance sounds like an edit command where I'm trying to edit the already-spoken text, in which case edit the running document text accordingly. In some cases, I may simply respeak a portion of the document text with the intent to have the respoken utterance replace some existing portion of the document text. After each utterance, simply present the entire content of the updated document text verbatim without any additional text. If it seems like I'm trying to edit the text but the intended target is not clear, keep the document text unchanged and ask me for clarification. For example, if I say 'change coffee to tea' and there are multiple 'coffee' in the document text, ask me 'which coffee did you mean?' and if I say 'the second one', replace the second instance of 'coffee' with 'tea'. If you assumed what I said was meant as an edit but then I say something like 'that should have been transcribed', then undo the edit and append the utterance as transcription. Conversely, if you assumed what I said was meant as a transcription but then I say something like 'that was meant as an edit', then try to interpret the utterance as an edit. If it is too unclear what the intended edit was, keep the document text unchanged and ask me for clarification.")
                     session.inputAudioTranscription = audioTranscription
                 }
             }
@@ -272,10 +274,11 @@ private extension Transcription {
 //            entries.removeAll { $0.id == event.itemId }
         case let .conversationItemInputAudioTranscriptionDelta(event):
             Logger.transcription.log("Conversation item input audio transcription delta: '\(event.delta)'")
-            transcript = event.delta
+            // Looks like currently, delta's come in all at once with the completed transcript, so it's kind of meaningless
+            utterance = event.delta
         case let .conversationItemInputAudioTranscriptionCompleted(event):
             Logger.transcription.log("Conversation item input audio transcription completed: '\(event.transcript)'")
-            transcript = event.transcript
+            utterance = event.transcript
 //            updateEvent(id: event.itemId) { message in
 //                guard case let .input_audio(audio) = message.content[event.contentIndex] else { return }
 //
@@ -287,7 +290,11 @@ private extension Transcription {
 //            updateEvent(id: event.itemId) { message in
 //                message.content.insert(.init(from: event.part), at: event.contentIndex)
 //            }
-//        case let .responseContentPartDone(event):
+        case let .responseContentPartDone(event):
+            if case .text(let text) = event.part {
+                Logger.transcription.log("Response content part done: '\(text)'")
+                transcript = text
+            }
 //            updateEvent(id: event.itemId) { message in
 //                message.content[event.contentIndex] = .init(from: event.part)
 //            }
