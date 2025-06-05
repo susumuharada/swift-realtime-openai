@@ -340,7 +340,7 @@ private extension Conversation {
 				updateEvent(id: event.itemId) { message in
 					guard case let .audio(audio) = message.content[event.contentIndex] else { return }
 
-//                    if handlingVoice { audioHandler.queueAudioSample(event) }
+                    if handlingVoice { audioHandler.queueAudioSample(event) }
 					message.content[event.contentIndex] = .audio(.init(audio: audio.audio + event.delta, transcript: audio.transcript))
 				}
 			case let .responseFunctionCallArgumentsDelta(event):
