@@ -40,10 +40,12 @@ public struct Session: Codable, Equatable, Sendable {
 		/// For `whisper`, the [prompt is a list of keywords](https://platform.openai.com/docs/guides/speech-to-text#prompting). For `gpt4o` models, the prompt is a free text string, for example "expect words related to technology".
 		public var prompt: String?
 
-		public init(model: TranscriptionModel = .whisper,
+		public init(model: TranscriptionModel = .gpt4o,
                     language: String? = nil,
                     prompt: String? = nil) {
 			self.model = model
+            self.language = language
+            self.prompt = prompt
 		}
 	}
 
