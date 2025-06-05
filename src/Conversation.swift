@@ -300,8 +300,12 @@ private extension Conversation {
 				}
 			case let .responseContentPartDone(event):
                 if case .text(let text) = event.part {
-                    Logger.transcription.log("Response content part done: '\(text)'")
+                    Logger.transcription.log("Response content text part done: '\(text)'")
                     transcript = text
+                } else if case .audio(let audio) = event.part,
+                          let audioTranscript = audio.transcript {
+                    Logger.transcription.log("Response content audio part done: '\(audioTranscript)'")
+                    transcript = audioTranscript
                 }
 				updateEvent(id: event.itemId) { message in
 					message.content[event.contentIndex] = .init(from: event.part)
