@@ -71,7 +71,9 @@ public final class WebSocketConnector: Connector, Sendable {
 	}
 
 	public func send(event: ClientEvent) async throws {
-		let message = try URLSessionWebSocketTask.Message.string(String(data: encoder.encode(event), encoding: .utf8)!)
+        let messageString = try String(data: encoder.encode(event), encoding: .utf8)!
+		let message = URLSessionWebSocketTask.Message.string(messageString)
+        print("Sending over webSocket: \(messageString)")
 		try await webSocket.send(message)
 	}
 
