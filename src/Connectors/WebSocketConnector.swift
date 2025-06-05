@@ -49,7 +49,7 @@ public final class WebSocketConnector: Connector, Sendable {
 						continue
 					}
                     if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-                       let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                       let jsonData = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]) {
                         Logger.webSocketConnector.log("Received message on web socket:\n\(String(decoding: jsonData, as: UTF8.self))")
                     } else {
                         Logger.webSocketConnector.log("Received message on web socket:\n\(text)")
@@ -82,7 +82,6 @@ public final class WebSocketConnector: Connector, Sendable {
 	public func send(event: ClientEvent) async throws {
         let messageString = try String(data: encoder.encode(event), encoding: .utf8)!
 		let message = URLSessionWebSocketTask.Message.string(messageString)
-        Logger.webSocketConnector.log("Sending over webSocket:\n\(messageString)")
 		try await webSocket.send(message)
 	}
 
