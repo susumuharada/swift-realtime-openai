@@ -26,6 +26,15 @@ public final class Conversation: @unchecked Sendable {
 	/// The current session for this conversation.
 	@MainActor public private(set) var session: Session?
 
+    /// The most recent utterance.
+    @MainActor public private(set) var utterance: String = ""
+
+    /// The accumulated transcript.
+    @MainActor public private(set) var transcript: String = ""
+
+    /// The latest response from the system.
+    @MainActor public private(set) var systemResponse: String = ""
+
 	/// A list of items in the conversation.
 	@MainActor public private(set) var entries: [Item] = []
 
@@ -94,7 +103,19 @@ public final class Conversation: @unchecked Sendable {
                 try await self?.send(audioDelta: audioData)
             }
         }
-	}
+
+        Task {
+            try await whenConnected {
+                Logger.transcription.log("Transcription connected")
+                try await updateSession { session in
+                    Logger.transcription.log("Updating prompt")
+                    session.instructions = "You’re a stenographer. Transcribe my words into a running document text, appending each utterance. If an utterance sounds like an edit command, edit the running text accordingly. Sometimes, I’ll respeak a portion of the document text to replace an existing part. After each utterance, present the updated document text verbatim. If I seem to edit the text but the target is unclear, keep the document unchanged and ask for clarification. For example, if I say ‘change coffee to tea’ and there are multiple ‘coffee’ in the document, ask ‘which coffee did you mean?’ and replace the second instance with ‘tea’. If you assumed an edit but I say ‘that should have been transcribed’, undo the edit and transcribe the utterance. Conversely, if you assumed a transcription but I say ‘that was meant as an edit’, interpret it as an edit. If the intent is unclear, keep the document unchanged and ask for clarification. If I spell out a word or name, try to find the text in the document text that is phonetically similar and if found, replace it with the spelled word with any casing adjustments made as appropriate. Once I make such an edit, if I transcribe the same word, apply the new spelling automatically."
+                    var audioTranscription = Session.InputAudioTranscription(model: .gpt4o, language: "en", prompt: "Expect a series of dictation utterances, with potentially some edit utterances interspersed, as well as spelling corrections.")
+                    session.inputAudioTranscription = audioTranscription
+                }
+            }
+        }
+}
 
 	deinit {
 		task.cancel()
@@ -264,6 +285,8 @@ private extension Conversation {
 			case let .conversationItemDeleted(event):
 				entries.removeAll { $0.id == event.itemId }
 			case let .conversationItemInputAudioTranscriptionCompleted(event):
+                Logger.transcription.log("Conversation item input audio transcription completed: '\(event.transcript)'")
+                utterance = event.transcript
 				updateEvent(id: event.itemId) { message in
 					guard case let .input_audio(audio) = message.content[event.contentIndex] else { return }
 
@@ -276,6 +299,10 @@ private extension Conversation {
 					message.content.insert(.init(from: event.part), at: event.contentIndex)
 				}
 			case let .responseContentPartDone(event):
+                if case .text(let text) = event.part {
+                    Logger.transcription.log("Response content part done: '\(text)'")
+                    transcript = text
+                }
 				updateEvent(id: event.itemId) { message in
 					message.content[event.contentIndex] = .init(from: event.part)
 				}
@@ -296,6 +323,8 @@ private extension Conversation {
 					message.content[event.contentIndex] = .audio(.init(audio: audio.audio, transcript: (audio.transcript ?? "") + event.delta))
 				}
 			case let .responseAudioTranscriptDone(event):
+                Logger.transcription.log("Response audio transcript done: '\(event.transcript)'")
+                systemResponse = event.transcript
 				updateEvent(id: event.itemId) { message in
 					guard case let .audio(audio) = message.content[event.contentIndex] else { return }
 
