@@ -48,7 +48,12 @@ public final class WebSocketConnector: Connector, Sendable {
 						stream.yield(error: RealtimeAPIError.invalidMessage)
 						continue
 					}
-                    Logger.webSocketConnector.log("Received message on web socket:\n\(text)")
+                    if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
+                       let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted) {
+                        Logger.webSocketConnector.log("Received message on web socket:\n\(String(decoding: jsonData, as: UTF8.self))")
+                    } else {
+                        Logger.webSocketConnector.log("Received message on web socket:\n\(text)")
+                    }
 
 					try stream.yield(decoder.decode(ServerEvent.self, from: data))
 				} catch {
