@@ -99,8 +99,11 @@ public final class Conversation: @unchecked Sendable {
 		}
 
         audioHandler.onAudioDeltaFromUser = { audioData in
-            Task { [weak self] in
-                try await self?.send(audioDelta: audioData)
+            Task { @MainActor [weak self] in
+                guard let self, self.connected else {
+                    return
+                }
+                try await self.send(audioDelta: audioData)
             }
         }
 
